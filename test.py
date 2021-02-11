@@ -63,8 +63,10 @@ def addFrame():
     data = ttk.Label(add,text='Дата:', font='Arial 16',anchor='e').grid(row=4,column=0,padx=5,sticky='EN')
     adddata = Calendar(add,background='#41ABE9').grid(row=4,column=1)
 
-    btnadd = ttk.Button(add,text='Добавить',style = "Bold.TButton").grid(row=5, column=1,sticky='ES', pady=10)
+    faddToTable = partial(addToTable,)
+    btnadd = ttk.Button(add,text='Добавить',style = "Bold.TButton", command=faddToTable).grid(row=5, column=1,sticky='ES', pady=10)
 
+def addToTable():
 
 
 def clearFrame():
