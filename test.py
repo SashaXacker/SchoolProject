@@ -10,13 +10,12 @@ sql = '''SELECT list.id, inventnum, typetext, cab, statustext, data FROM list
                 JOIN typelist ON list.type = typelist.id
                 JOIN statuslist ON list.status = statuslist.id'''
 
-sqltype = '''SELECT list.id,inventnum, typetext, cab, statustext, data FROM list
+sqltype = '''SELECT inventnum, typetext, cab, statustext FROM list
                 JOIN typelist ON list.type = typelist.id
                 JOIN statuslist ON list.status = statuslist.id
                 WHERE list.{obj} = {type}'''
 
 typelist = '''SELECT typetext FROM typelist'''
-
 statuslist = 'SELECT statustext FROM statuslist'
 
 
@@ -48,14 +47,16 @@ def addFrame():
     comlist(comtype,typelist)
     comstatus = []
     comlist(comstatus,statuslist)
+    numberadd = StringVar()
     num = ttk.Label(add,text='Номер:', font='Arial 16',anchor='e').grid(row=0,column=0,padx=5,sticky=E)
-    addnum = ttk.Entry(add, font='Arial 16',width=18).grid(row=0,column=1,sticky=W)
+    addnum = ttk.Entry(add, font='Arial 16',textvariable=numberadd,width=18).grid(row=0,column=1,sticky=W)
 
     type = ttk.Label(add,text='Тип:', font='Arial 16',anchor='e').grid(row=1,column=0,padx=5,pady=3,sticky=E)
     addtype = ttk.Combobox(add,values=comtype,state='readonly',font='Arial 16',width=17).grid(row=1,column=1,pady=3,sticky=W)
 
+    cabadd = StringVar()
     cab = ttk.Label(add,text='Кабинет:', font='Arial 16',anchor='e').grid(row=2,column=0,padx=5,sticky=E)
-    addcab = ttk.Entry(add, font='Arial 16',width=18).grid(row=2,column=1,sticky=W)
+    addcab = ttk.Entry(add, font='Arial 16',width=18,textvariable=cabadd).grid(row=2,column=1,sticky=W)
     
     status = ttk.Label(add,text='Статус:', font='Arial 16',anchor='e').grid(row=3,column=0,padx=5,sticky=E,pady=3)
     addstatus = ttk.Combobox(add,values=comstatus,state='readonly',font='Arial 16',width=17).grid(row=3,column=1,pady=3,sticky=W)
@@ -63,22 +64,25 @@ def addFrame():
     data = ttk.Label(add,text='Дата:', font='Arial 16',anchor='e').grid(row=4,column=0,padx=5,sticky='EN')
     adddata = Calendar(add,background='#41ABE9').grid(row=4,column=1)
 
-    faddToTable = partial(addToTable,)
-    btnadd = ttk.Button(add,text='Добавить',style = "Bold.TButton", command=faddToTable).grid(row=5, column=1,sticky='ES', pady=10)
+    faddstr = partial(addstr,numberadd,cabadd,addstatus) 
+    btnadd = ttk.Button(add,text='Добавить',style = "Bold.TButton",command=faddstr).grid(row=5, column=1,sticky='ES', pady=10)
 
-def addToTable():
+def addstr(numberadd,cabadd,addstatus):
+    print(numberadd.get())
+    print(cabadd.get())
+    print()
 
 
 def clearFrame():
     for widget in main.winfo_children():
         widget.destroy()
     plabel  = ttk.Label(main,text='').grid(row=0,column=0)
-    id      = ttk.Label(main, text='ID', font='Arial 16',background='#fff', width=3).grid(row=1, column=0, padx=3)
-    num      = ttk.Label(main, text='Номер', font='Arial 16',background='#fff', width=12).grid(row=1, column=1, sticky=W)
-    type    = ttk.Label(main,text='Тип',font='Arial 16',background='#fff',  width=10).grid(row=1, column=2, sticky=W)
-    cab     = ttk.Label(main,text='Кабинет', font='Arial 16', background='#fff',width=5).grid(row=1, column=3, sticky=W, padx=2)
-    status  = ttk.Label(main,text='Статус', font='Arial 16',  background='#fff',width=7).grid(row=1, column=4, sticky=W)
-    data    = ttk.Label(main, text='Дата', font='Arial 16',background='#fff', width=9).grid(row=1, column=5, sticky=W, padx=2)
+    #убрать!id      = ttk.Label(main, text='ID', font='Arial 16',background='#fff', width=3).grid(row=1, column=0, padx=3)
+    num      = ttk.Label(main, text='Номер', font='Arial 16',background='#fff', width=12).grid(row=1, column=0, sticky=W)
+    type    = ttk.Label(main,text='Тип',font='Arial 16',background='#fff',  width=10).grid(row=1, column=1, sticky=W)
+    cab     = ttk.Label(main,text='Кабинет', font='Arial 16', background='#fff',width=5).grid(row=1, column=2, sticky=W, padx=2)
+    status  = ttk.Label(main,text='Статус', font='Arial 16',  background='#fff',width=7).grid(row=1, column=3, sticky=W)
+    data    = ttk.Label(main, text='Дата', font='Arial 16',background='#fff', width=9).grid(row=1, column=4, sticky=W, padx=2)
 
     btnall = ttk.Button(main,text='Вся база', width=11,style = "Bold.TButton", command=mainmenu).grid(row=1,column=6,sticky=E, padx=5)
     ftypebtn1 = partial(typebtn,'type', 1)
@@ -89,26 +93,26 @@ def clearFrame():
     btnstatus1 = ttk.Button(main,text='Активно', width=11,style = "Bold.TButton", command=fstatus1).grid(row=4,column=6,sticky=E,padx=5)
     fstatus2 = partial(typebtn,'status',2)
     btnstatus1 = ttk.Button(main,text='Архив', width=11,style = "Bold.TButton", command=fstatus2).grid(row=4,column=6,sticky=E,padx=5)
-    btnadd = ttk.Button(main,text='Добавить', width=9,style = "Bold.TButton",command=addFrame).grid(row=17,column=0,columnspan=2,sticky='WS',padx=15)
+    btnadd = ttk.Button(main,text='Добавить', width=8,style = "Bold.TButton",command=addFrame).grid(row=17,column=0,columnspan=2,sticky=W,padx=2)
 
 
 
 
 def view(i,*x):
     if i % 2 == 0:
-        id     = ttk.Label(main,text=x[0],font='Arial 16',background='#b3b4bc',width=3).grid(row=i,column=0,padx=2,pady=5,sticky=W)
-        num    = ttk.Label(main,text=x[1],font='Arial 16',background='#b3b4bc',width=12,anchor='e').grid(row=i,column=1,sticky=W,pady=5)
-        type   = ttk.Label(main,text=x[2],font='Arial 16',background='#b3b4bc',width=10).grid(row=i,column=2,sticky=W,pady=5,padx=2)
-        cab    = ttk.Label(main,text=x[3],font='Arial 16',background='#b3b4bc',width=5).grid(row=i,column=3,sticky=W,pady=5)
-        status = ttk.Label(main,text=x[4],font='Arial 16',background='#b3b4bc',width=7).grid(row=i,column=4,sticky=W,pady=5,padx=2)
-        data   = ttk.Label(main,text=x[5],font='Arial 16',background='#b3b4bc',width=9).grid(row=i,column=5,sticky=W,pady=5)
+        #убрать! id     = ttk.Label(main,text=x[0],font='Arial 16',background='#b3b4bc',width=3).grid(row=i,column=0,padx=2,pady=5,sticky=W)
+        num    = ttk.Label(main,text=x[1],font='Arial 16',background='#b3b4bc',width=12,anchor='e').grid(row=i,column=0,sticky=W,pady=5)
+        type   = ttk.Label(main,text=x[2],font='Arial 16',background='#b3b4bc',width=10).grid(row=i,column=1,sticky=W,pady=5,padx=2)
+        cab    = ttk.Label(main,text=x[3],font='Arial 16',background='#b3b4bc',width=5).grid(row=i,column=2,sticky=W,pady=5)
+        status = ttk.Label(main,text=x[4],font='Arial 16',background='#b3b4bc',width=7).grid(row=i,column=3,sticky=W,pady=5,padx=2)
+        data   = ttk.Label(main,text=x[5],font='Arial 16',background='#b3b4bc',width=9).grid(row=i,column=4,sticky=W,pady=5)
     else:
-        id     = ttk.Label(main,text=x[0],font='Arial 16',background='#b3b4bc',width=3).grid(row=i,column=0,padx=2)
-        num    = ttk.Label(main,text=x[1],font='Arial 16',background='#b3b4bc',width=12,anchor='e').grid(row=i,column=1,sticky=W)
-        type   = ttk.Label(main,text=x[2],font='Arial 16',background='#b3b4bc',width=10).grid(row=i,column=2,sticky=W,padx=2)
-        cab    = ttk.Label(main,text=x[3],font='Arial 16',background='#b3b4bc',width=5).grid(row=i,column=3,sticky=W)
-        status = ttk.Label(main,text=x[4],font='Arial 16',background='#b3b4bc',width=7).grid(row=i,column=4,sticky=W,padx=2)           
-        data   = ttk.Label(main,text=x[5],font='Arial 16',background='#b3b4bc',width=9).grid(row=i,column=5,sticky=W)
+        #убрать! id     = ttk.Label(main,text=x[0],font='Arial 16',background='#b3b4bc',width=3).grid(row=i,column=0,padx=2)
+        num    = ttk.Label(main,text=x[1],font='Arial 16',background='#b3b4bc',width=12,anchor='e').grid(row=i,column=0,sticky=W)
+        type   = ttk.Label(main,text=x[2],font='Arial 16',background='#b3b4bc',width=10).grid(row=i,column=1,sticky=W,padx=2)
+        cab    = ttk.Label(main,text=x[3],font='Arial 16',background='#b3b4bc',width=5).grid(row=i,column=2,sticky=W)
+        status = ttk.Label(main,text=x[4],font='Arial 16',background='#b3b4bc',width=7).grid(row=i,column=3,sticky=W,padx=2)           
+        data   = ttk.Label(main,text=x[5],font='Arial 16',background='#b3b4bc',width=9).grid(row=i,column=4,sticky=W)
 
 
 def typebtn(obj,type):
