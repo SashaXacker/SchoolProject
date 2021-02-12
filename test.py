@@ -4,11 +4,13 @@ import sqlite3
 from ttkthemes import ThemedTk
 import tkinter.ttk as ttk
 from tkcalendar import Calendar
+from datetime import datetime
 
 
-sql = '''SELECT list.id, inventnum, typetext, cab, statustext, data FROM list
+sql = '''SELECT inventNum, typetext, cabinet.number, statustext, dataEdit FROM list
                 JOIN typelist ON list.type = typelist.id
-                JOIN statuslist ON list.status = statuslist.id'''
+                JOIN statuslist ON list.status = statuslist.id
+                JOIN cabinet ON list.cab = cabinet.id'''
 
 sqltype = '''SELECT inventnum, typetext, cab, statustext FROM list
                 JOIN typelist ON list.type = typelist.id
@@ -78,9 +80,9 @@ def clearFrame():
         widget.destroy()
     plabel  = ttk.Label(main,text='').grid(row=0,column=0)
     #убрать!id      = ttk.Label(main, text='ID', font='Arial 16',background='#fff', width=3).grid(row=1, column=0, padx=3)
-    num      = ttk.Label(main, text='Номер', font='Arial 16',background='#fff', width=12).grid(row=1, column=0, sticky=W)
+    num      = ttk.Label(main, text='Номер', font='Arial 16',background='#fff', width=12).grid(row=1, column=0, sticky=W,padx=2)
     type    = ttk.Label(main,text='Тип',font='Arial 16',background='#fff',  width=10).grid(row=1, column=1, sticky=W)
-    cab     = ttk.Label(main,text='Кабинет', font='Arial 16', background='#fff',width=5).grid(row=1, column=2, sticky=W, padx=2)
+    cab     = ttk.Label(main,text='Кабинет', font='Arial 16', background='#fff',width=7).grid(row=1, column=2, sticky=W, padx=2)
     status  = ttk.Label(main,text='Статус', font='Arial 16',  background='#fff',width=7).grid(row=1, column=3, sticky=W)
     data    = ttk.Label(main, text='Дата', font='Arial 16',background='#fff', width=9).grid(row=1, column=4, sticky=W, padx=2)
 
@@ -101,18 +103,18 @@ def clearFrame():
 def view(i,*x):
     if i % 2 == 0:
         #убрать! id     = ttk.Label(main,text=x[0],font='Arial 16',background='#b3b4bc',width=3).grid(row=i,column=0,padx=2,pady=5,sticky=W)
-        num    = ttk.Label(main,text=x[1],font='Arial 16',background='#b3b4bc',width=12,anchor='e').grid(row=i,column=0,sticky=W,pady=5)
-        type   = ttk.Label(main,text=x[2],font='Arial 16',background='#b3b4bc',width=10).grid(row=i,column=1,sticky=W,pady=5,padx=2)
-        cab    = ttk.Label(main,text=x[3],font='Arial 16',background='#b3b4bc',width=5).grid(row=i,column=2,sticky=W,pady=5)
-        status = ttk.Label(main,text=x[4],font='Arial 16',background='#b3b4bc',width=7).grid(row=i,column=3,sticky=W,pady=5,padx=2)
-        data   = ttk.Label(main,text=x[5],font='Arial 16',background='#b3b4bc',width=9).grid(row=i,column=4,sticky=W,pady=5)
+        num    = ttk.Label(main,text=x[0],font='Arial 16',background='#b3b4bc',width=12,anchor='e').grid(row=i,column=0,sticky=W,pady=5,padx=2)
+        type   = ttk.Label(main,text=x[1],font='Arial 16',background='#b3b4bc',width=10).grid(row=i,column=1,sticky=W,pady=5)
+        cab    = ttk.Label(main,text=x[2],font='Arial 16',background='#b3b4bc',width=7).grid(row=i,column=2,sticky=W,pady=5,padx=2)
+        status = ttk.Label(main,text=x[3],font='Arial 16',background='#b3b4bc',width=7).grid(row=i,column=3,sticky=W,pady=5)
+        data   = ttk.Label(main,text=x[4],font='Arial 16',background='#b3b4bc',width=9).grid(row=i,column=4,sticky=W,pady=5,padx=2)
     else:
         #убрать! id     = ttk.Label(main,text=x[0],font='Arial 16',background='#b3b4bc',width=3).grid(row=i,column=0,padx=2)
-        num    = ttk.Label(main,text=x[1],font='Arial 16',background='#b3b4bc',width=12,anchor='e').grid(row=i,column=0,sticky=W)
-        type   = ttk.Label(main,text=x[2],font='Arial 16',background='#b3b4bc',width=10).grid(row=i,column=1,sticky=W,padx=2)
-        cab    = ttk.Label(main,text=x[3],font='Arial 16',background='#b3b4bc',width=5).grid(row=i,column=2,sticky=W)
-        status = ttk.Label(main,text=x[4],font='Arial 16',background='#b3b4bc',width=7).grid(row=i,column=3,sticky=W,padx=2)           
-        data   = ttk.Label(main,text=x[5],font='Arial 16',background='#b3b4bc',width=9).grid(row=i,column=4,sticky=W)
+        num    = ttk.Label(main,text=x[0],font='Arial 16',background='#b3b4bc',width=12,anchor='e').grid(row=i,column=0,sticky=W,padx=2)
+        type   = ttk.Label(main,text=x[1],font='Arial 16',background='#b3b4bc',width=10).grid(row=i,column=1,sticky=W)
+        cab    = ttk.Label(main,text=x[2],font='Arial 16',background='#b3b4bc',width=7).grid(row=i,column=2,sticky=W,padx=2)
+        status = ttk.Label(main,text=x[3],font='Arial 16',background='#b3b4bc',width=7).grid(row=i,column=3,sticky=W)           
+        data   = ttk.Label(main,text=x[4],font='Arial 16',background='#b3b4bc',width=9).grid(row=i,column=4,sticky=W,padx=2)
 
 
 def typebtn(obj,type):
@@ -235,4 +237,5 @@ main.grid()
 boldStyle = ttk.Style ()
 boldStyle.configure("Bold.TButton", font = ('Arial','14'))
 mainmenu()
+
 root.mainloop()
