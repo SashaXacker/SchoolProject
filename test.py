@@ -12,14 +12,25 @@ sql = '''SELECT inventNum, typetext, cabinet.number, statustext, dataEdit FROM l
                 JOIN statuslist ON list.status = statuslist.id
                 JOIN cabinet ON list.cab = cabinet.id'''
 
-sqltype = '''SELECT inventnum, typetext, cab, statustext FROM list
+sqltype = '''SELECT inventNum, typetext, cabinet.number, statustext, dataEdit FROM list
                 JOIN typelist ON list.type = typelist.id
                 JOIN statuslist ON list.status = statuslist.id
+                JOIN cabinet ON list.cab = cabinet.id
                 WHERE list.{obj} = {type}'''
 
 typelist = '''SELECT typetext FROM typelist'''
 statuslist = 'SELECT statustext FROM statuslist'
 
+
+def date():
+    time = datetime.now()
+    str(time)
+    day = time.day
+    month = time.month
+    if len(str(month)) == 1:month = '0' + str(month)
+    year = time.year
+    now = str(day)+ '.' + str(month) + '.' + str(year)
+    return now
 
 def size(w,h,qframe):
     qframe.resizable(width=False, height=False)
@@ -55,15 +66,14 @@ def addFrame():
 
     type = ttk.Label(add,text='Тип:', font='Arial 16',anchor='e').grid(row=1,column=0,padx=5,pady=3,sticky=E)
     addtype = ttk.Combobox(add,values=comtype,state='readonly',font='Arial 16',width=17).grid(row=1,column=1,pady=3,sticky=W)
-
-    cabadd = StringVar()
+    
     cab = ttk.Label(add,text='Кабинет:', font='Arial 16',anchor='e').grid(row=2,column=0,padx=5,sticky=E)
-    addcab = ttk.Entry(add, font='Arial 16',width=18,textvariable=cabadd).grid(row=2,column=1,sticky=W)
+    addcab = ttk.Combobox(add, values=comcab,font='Arial 16',width=17).grid(row=2,column=1,sticky=W)
     
     status = ttk.Label(add,text='Статус:', font='Arial 16',anchor='e').grid(row=3,column=0,padx=5,sticky=E,pady=3)
     addstatus = ttk.Combobox(add,values=comstatus,state='readonly',font='Arial 16',width=17).grid(row=3,column=1,pady=3,sticky=W)
     
-    data = ttk.Label(add,text='Дата:', font='Arial 16',anchor='e').grid(row=4,column=0,padx=5,sticky='EN')
+    data = ttk.Label(add,text='Дата на учете:', font='Arial 16',anchor='e').grid(row=4,column=0,padx=5,sticky='EN')
     adddata = Calendar(add,background='#41ABE9').grid(row=4,column=1)
 
     faddstr = partial(addstr,numberadd,cabadd,addstatus) 
@@ -79,12 +89,11 @@ def clearFrame():
     for widget in main.winfo_children():
         widget.destroy()
     plabel  = ttk.Label(main,text='').grid(row=0,column=0)
-    #убрать!id      = ttk.Label(main, text='ID', font='Arial 16',background='#fff', width=3).grid(row=1, column=0, padx=3)
     num      = ttk.Label(main, text='Номер', font='Arial 16',background='#fff', width=12).grid(row=1, column=0, sticky=W,padx=2)
     type    = ttk.Label(main,text='Тип',font='Arial 16',background='#fff',  width=10).grid(row=1, column=1, sticky=W)
     cab     = ttk.Label(main,text='Кабинет', font='Arial 16', background='#fff',width=7).grid(row=1, column=2, sticky=W, padx=2)
     status  = ttk.Label(main,text='Статус', font='Arial 16',  background='#fff',width=7).grid(row=1, column=3, sticky=W)
-    data    = ttk.Label(main, text='Дата', font='Arial 16',background='#fff', width=9).grid(row=1, column=4, sticky=W, padx=2)
+    data    = ttk.Label(main, text='Дата изменения', font='Arial 16',background='#fff', width=13).grid(row=1, column=4, sticky=W, padx=2)
 
     btnall = ttk.Button(main,text='Вся база', width=11,style = "Bold.TButton", command=mainmenu).grid(row=1,column=6,sticky=E, padx=5)
     ftypebtn1 = partial(typebtn,'type', 1)
@@ -102,19 +111,17 @@ def clearFrame():
 
 def view(i,*x):
     if i % 2 == 0:
-        #убрать! id     = ttk.Label(main,text=x[0],font='Arial 16',background='#b3b4bc',width=3).grid(row=i,column=0,padx=2,pady=5,sticky=W)
-        num    = ttk.Label(main,text=x[0],font='Arial 16',background='#b3b4bc',width=12,anchor='e').grid(row=i,column=0,sticky=W,pady=5,padx=2)
+        num    = ttk.Label(main,text=x[0],font='Arial 16',background='#b3b4bc',width=12,anchor='w').grid(row=i,column=0,sticky=W,pady=5,padx=2)
         type   = ttk.Label(main,text=x[1],font='Arial 16',background='#b3b4bc',width=10).grid(row=i,column=1,sticky=W,pady=5)
-        cab    = ttk.Label(main,text=x[2],font='Arial 16',background='#b3b4bc',width=7).grid(row=i,column=2,sticky=W,pady=5,padx=2)
+        cab    = ttk.Label(main,text=x[2],font='Arial 16',background='#b3b4bc',width=7,anchor='w').grid(row=i,column=2,sticky=W,pady=5,padx=2)
         status = ttk.Label(main,text=x[3],font='Arial 16',background='#b3b4bc',width=7).grid(row=i,column=3,sticky=W,pady=5)
-        data   = ttk.Label(main,text=x[4],font='Arial 16',background='#b3b4bc',width=9).grid(row=i,column=4,sticky=W,pady=5,padx=2)
+        data   = ttk.Label(main,text=x[4],font='Arial 16',background='#b3b4bc',width=13).grid(row=i,column=4,sticky=W,pady=5,padx=2)
     else:
-        #убрать! id     = ttk.Label(main,text=x[0],font='Arial 16',background='#b3b4bc',width=3).grid(row=i,column=0,padx=2)
-        num    = ttk.Label(main,text=x[0],font='Arial 16',background='#b3b4bc',width=12,anchor='e').grid(row=i,column=0,sticky=W,padx=2)
+        num    = ttk.Label(main,text=x[0],font='Arial 16',background='#b3b4bc',width=12,anchor='w').grid(row=i,column=0,sticky=W,padx=2)
         type   = ttk.Label(main,text=x[1],font='Arial 16',background='#b3b4bc',width=10).grid(row=i,column=1,sticky=W)
-        cab    = ttk.Label(main,text=x[2],font='Arial 16',background='#b3b4bc',width=7).grid(row=i,column=2,sticky=W,padx=2)
+        cab    = ttk.Label(main,text=x[2],font='Arial 16',background='#b3b4bc',width=7,anchor='w').grid(row=i,column=2,sticky=W,padx=2)
         status = ttk.Label(main,text=x[3],font='Arial 16',background='#b3b4bc',width=7).grid(row=i,column=3,sticky=W)           
-        data   = ttk.Label(main,text=x[4],font='Arial 16',background='#b3b4bc',width=9).grid(row=i,column=4,sticky=W,padx=2)
+        data   = ttk.Label(main,text=x[4],font='Arial 16',background='#b3b4bc',width=13).grid(row=i,column=4,sticky=W,padx=2)
 
 
 def typebtn(obj,type):
@@ -132,12 +139,12 @@ def typebtn(obj,type):
 
 def nextbtn(already):
     nextstring = partial(nextstr, already)
-    nextbtn = ttk.Button(main,text='next -->',style = "Bold.TButton",width=6,command=nextstring).grid(row=17,column=5,sticky=E)
+    nextbtn = ttk.Button(main,text='next -->',style = "Bold.TButton",width=6,command=nextstring).grid(row=17,column=4,sticky=E)
 
 
 def prevbtn(already):
     prevstring = partial(prevstr, already)
-    prevbtn = ttk.Button(main,text='<-- prev',style = "Bold.TButton",width=6,command=prevstring).grid(row=17,column=4,sticky=W)
+    prevbtnn = ttk.Button(main,text='<-- prev',style = "Bold.TButton",width=6,command=prevstring).grid(row=17,column=3,sticky=W)
 
 
 def nextstr(qstr):
@@ -176,27 +183,36 @@ def prevstr(qstr):
     with sqlite3.connect('server.db') as con:
         cur = con.cursor()
         cur.execute(sql)
-        qlen = len(cur.fetchall()) - qstr
+        qlen = qstr - 15
 ################ НЕ ДОДЕЛАНО!!!##################
-        if qlen > 15:
+        if qstr < len(cur.fetchall()):
+            clearFrame()
             cur.execute(sql)
-            print(len(cur.fetchall()))
-            # for j in range(0,qlen):
-            #     print(cur.fetchone())
-
-            # print(cur.fetchall())
-            print(qstr)
+            i=2
+            for j in range(0,qlen-15):
+                x = cur.fetchone()
+            for x in range(qlen,qstr):
+                x = cur.fetchone()
+                view(i,*x)
+                i+=1
+                qstr-=1
+            nextbtn(qstr)
+            prevbtn(qstr)                
 ################################################
         else:
             clearFrame()
             cur.execute(sql)
             i=2
-            for j in range(0,15):
+            for j in range(0,qlen):
                 x = cur.fetchone()
+
+            list = cur.fetchall()
+            for x in list:
                 view(i,*x)      
                 i+=1
-            a = i - 2
-            nextbtn(a)
+            qstr = qstr - (qstr % 15)
+            nextbtn(qstr)
+            prevbtn(qstr)
     
 
 
