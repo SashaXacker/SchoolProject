@@ -3,6 +3,7 @@ from functools import partial
 from tkinter import messagebox
 import sqlite3
 import test
+import datetime
 
 
 #Регистрация
