@@ -1,11 +1,12 @@
 from tkinter import *
+from tkinter import messagebox
 from functools import partial
 import sqlite3
 from ttkthemes import ThemedTk
 import tkinter.ttk as ttk
 from tkcalendar import Calendar
 from datetime import datetime
-
+from time import sleep
 
 sql = '''SELECT inventNum, typetext, cabinet.number, statustext, dataEdit FROM list
 				JOIN typelist ON list.type = typelist.id
@@ -20,6 +21,10 @@ sqltype = '''SELECT inventNum, typetext, cabinet.number, statustext, dataEdit FR
 
 typelist = '''SELECT typetext FROM typelist'''
 statuslist = 'SELECT statustext FROM statuslist'
+cablist = '''SELECT cabinet.number FROM list
+			JOIN cabinet ON list.cab = cabinet.id'''
+
+insertsql = 'INSERT INTO list( inventNum, type, cab, status, dataRegistration, dataEdit )'
 
 
 def date():
@@ -60,29 +65,108 @@ def addFrame():
 	comlist(comtype,typelist)
 	comstatus = []
 	comlist(comstatus,statuslist)
+	comcab = []
+	comlist(comcab,cablist)
 	numberadd = StringVar()
 	num = ttk.Label(add,text='Номер:', font='Arial 16',anchor='e').grid(row=0,column=0,padx=5,sticky=E)
 	addnum = ttk.Entry(add, font='Arial 16',textvariable=numberadd,width=18).grid(row=0,column=1,sticky=W)
 
+	typeadd = StringVar()
 	type = ttk.Label(add,text='Тип:', font='Arial 16',anchor='e').grid(row=1,column=0,padx=5,pady=3,sticky=E)
-	addtype = ttk.Combobox(add,values=comtype,state='readonly',font='Arial 16',width=17).grid(row=1,column=1,pady=3,sticky=W)
+	addtype = ttk.Combobox(add,values=comtype,state='readonly',textvariable=typeadd,font='Arial 16',width=17).grid(row=1,column=1,pady=3,sticky=W)
 	
+	cabadd = StringVar()
 	cab = ttk.Label(add,text='Кабинет:', font='Arial 16',anchor='e').grid(row=2,column=0,padx=5,sticky=E)
-	addcab = ttk.Combobox(add, values=comcab,font='Arial 16',width=17).grid(row=2,column=1,sticky=W)
+	addcab = ttk.Combobox(add, values=comcab,state='readonly',textvariable=cabadd,font='Arial 16',width=17).grid(row=2,column=1,sticky=W)
 	
+	statusadd = StringVar()
 	status = ttk.Label(add,text='Статус:', font='Arial 16',anchor='e').grid(row=3,column=0,padx=5,sticky=E,pady=3)
-	addstatus = ttk.Combobox(add,values=comstatus,state='readonly',font='Arial 16',width=17).grid(row=3,column=1,pady=3,sticky=W)
+	addstatus = ttk.Combobox(add,values=comstatus,state='readonly',textvariable=statusadd,font='Arial 16',width=17).grid(row=3,column=1,pady=3,sticky=W)
 	
-	data = ttk.Label(add,text='Дата на учете:', font='Arial 16',anchor='e').grid(row=4,column=0,padx=5,sticky='EN')
-	adddata = Calendar(add,background='#41ABE9').grid(row=4,column=1)
+	dateregadd = StringVar()
+	datereg = ttk.Label(add,text='Дата на учете:', font='Arial 16',anchor='e').grid(row=4,column=0,padx=5,sticky='EN')
+	adddatereg = Calendar(add,background='#41ABE9',textvariable = dateregadd).grid(row=4,column=1)
 
-	faddstr = partial(addstr,numberadd,cabadd,addstatus) 
+	faddstr = partial(addstr,numberadd,typeadd,cabadd,statusadd,dateregadd,add) 
 	btnadd = ttk.Button(add,text='Добавить',style = "Bold.TButton",command=faddstr).grid(row=5, column=1,sticky='ES', pady=10)
 
-def addstr(numberadd,cabadd,addstatus):
-	print(numberadd.get())
-	print(cabadd.get())
-	print()
+
+def select(sqlobj,sqlist,obj):
+	curr = ''
+	with sqlite3.connect('server.db') as con:
+		cur = con.cursor()
+		qsql = 'SELECT id,{obj} FROM {list}'.format(obj=sqlobj,list=sqlist)
+		cur.execute(qsql)
+		lendth = len(cur.fetchall())
+		cur.execute(qsql)
+		for i in range(0,lendth):
+			x = cur.fetchone()
+			if x[1] == obj:
+				curr = x[0]
+				break
+	return curr
+
+
+def addstr(numberadd,typeadd,cabadd,statusadd,dateregadd,add):
+	number = numberadd.get()
+
+	type = typeadd.get()
+	cab = int(cabadd.get()) 
+	status = statusadd.get()
+	
+	datereg = dateregadd.get()
+	datechng = date()
+
+	type = select('typetext','typelist',type)
+	cab = select('number', 'cabinet', cab)
+	status = select('statustext', 'statuslist', status)
+	
+	
+
+	templist = [number,type,cab,status,datereg,datechng]
+	for x in templist:
+		if x == '':
+			messagebox.showinfo('Ошибка','Введите все данные')
+			break
+	with sqlite3.connect('server.db') as con:
+		cur = con.cursor()
+		try:
+			cur.execute('''INSERT INTO list (inventNum, type, cab, status, dataEdit, dataRegistration)
+						VALUES(?, ?, ?, ?, ?, ?)''',templist)
+			con.commit()
+			messagebox.showinfo('Успешно', 'Элемент добавлен')
+		except:
+			messagebox.showinfo('Ошибка', 'Введите верные данные')
+	add.destroy()
+	sleep(1)
+	mainmenu()
+	
+
+def deleteFrame():
+	delete = Toplevel(root)
+	w = 400
+	h = 400
+	size(w,h,delete)
+	delete.grid()
+	numberdelete=StringVar()
+	num = ttk.Label(delete,text='Номер:', font='Arial 16',anchor='e').grid(row=0,column=0,padx=5,sticky=E)
+	addnum = ttk.Entry(delete, font='Arial 16',textvariable=numberdelete,width=18).grid(row=0,column=1,sticky=W)
+	fdeletestr = partial(deletestr, numberdelete, delete)
+	btndelete = ttk.Button(delete,text='Удалить',style = "Bold.TButton",command=fdeletestr).grid(row=1, column=1,sticky='ES', pady=10)
+
+
+def deletestr(number, delete):
+	number = number.get()
+	with sqlite3.connect('server.db') as con:
+		cur = con.cursor()
+		try:
+			cur.execute(f'DELETE FROM list WHERE inventNum = {number}')
+			messagebox.showinfo('Успешно', 'Элемент удален')
+		except:
+			messagebox.showinfo('Ошибка', 'Введите верный номер')
+	delete.destroy()
+	sleep(1)
+	mainmenu()
 
 
 def clearFrame():
@@ -93,18 +177,19 @@ def clearFrame():
 	type    = ttk.Label(main,text='Тип',font='Arial 16',background='#fff',  width=10).grid(row=1, column=1, sticky=W)
 	cab     = ttk.Label(main,text='Кабинет', font='Arial 16', background='#fff',width=7).grid(row=1, column=2, sticky=W, padx=2)
 	status  = ttk.Label(main,text='Статус', font='Arial 16',  background='#fff',width=7).grid(row=1, column=3, sticky=W)
-	data    = ttk.Label(main, text='Дата изменения', font='Arial 16',background='#fff', width=13).grid(row=1, column=4, sticky=W, padx=2)
+	data    = ttk.Label(main, text='Дата изменения', font='Arial 16',background='#fff', width=14).grid(row=1, column=4, sticky=W, padx=2)
 
-	btnall = ttk.Button(main,text='Вся база', width=11,style = "Bold.TButton", command=mainmenu).grid(row=1,column=6,sticky=E, padx=5)
-	ftypebtn1 = partial(typebtn,'type', 1)
-	btntype1 = ttk.Button(main,text='Компьютеры', width=11,style = "Bold.TButton", command=ftypebtn1).grid(row=2,column=6,sticky=E, padx=5)
-	ftypebtn2 = partial(typebtn,'type',2)
-	btntype2 = ttk.Button(main,text='Ноутбуки', width=11,style = "Bold.TButton", command=ftypebtn2).grid(row=3,column=6,sticky=E,padx=5)
-	fstatus1 = partial(typebtn,'status',1)
-	btnstatus1 = ttk.Button(main,text='Активно', width=11,style = "Bold.TButton", command=fstatus1).grid(row=4,column=6,sticky=E,padx=5)
-	fstatus2 = partial(typebtn,'status',2)
-	btnstatus1 = ttk.Button(main,text='Архив', width=11,style = "Bold.TButton", command=fstatus2).grid(row=4,column=6,sticky=E,padx=5)
-	btnadd = ttk.Button(main,text='Добавить', width=8,style = "Bold.TButton",command=addFrame).grid(row=17,column=0,columnspan=2,sticky=W,padx=2)
+	# btnall = ttk.Button(main,text='Вся база', width=11,style = "Bold.TButton", command=mainmenu).grid(row=1,column=6,sticky=E, padx=5)
+	# ftypebtn1 = partial(typebtn,'type', 1)
+	# btntype1 = ttk.Button(main,text='Компьютеры', width=11,style = "Bold.TButton", command=ftypebtn1).grid(row=2,column=6,sticky=E, padx=5)
+	# ftypebtn2 = partial(typebtn,'type',2)
+	# btntype2 = ttk.Button(main,text='Ноутбуки', width=11,style = "Bold.TButton", command=ftypebtn2).grid(row=3,column=6,sticky=E,padx=5)
+	# fstatus1 = partial(typebtn,'status',1)
+	# btnstatus1 = ttk.Button(main,text='Активно', width=11,style = "Bold.TButton", command=fstatus1).grid(row=4,column=6,sticky=E,padx=5)
+	# fstatus2 = partial(typebtn,'status',2)
+	# btnstatus1 = ttk.Button(main,text='Архив', width=11,style = "Bold.TButton", command=fstatus2).grid(row=4,column=6,sticky=E,padx=5)
+	btnadd = ttk.Button(main,text='Добавить', width=9,style = "Bold.TButton",command=addFrame).grid(row=17,column=0,sticky=E,padx=2,pady=5)
+	btndelete = ttk.Button(main,text='Удалить', width=9,style = "Bold.TButton",command=deleteFrame).grid(row=17,column=1,sticky=W,pady=5)
 
 
 
@@ -115,13 +200,13 @@ def view(i,*x):
 		type   = ttk.Label(main,text=x[1],font='Arial 16',background='#b3b4bc',width=10).grid(row=i,column=1,sticky=W,pady=5)
 		cab    = ttk.Label(main,text=x[2],font='Arial 16',background='#b3b4bc',width=7,anchor='w').grid(row=i,column=2,sticky=W,pady=5,padx=2)
 		status = ttk.Label(main,text=x[3],font='Arial 16',background='#b3b4bc',width=7).grid(row=i,column=3,sticky=W,pady=5)
-		data   = ttk.Label(main,text=x[4],font='Arial 16',background='#b3b4bc',width=13).grid(row=i,column=4,sticky=W,pady=5,padx=2)
+		data   = ttk.Label(main,text=x[4],font='Arial 16',background='#b3b4bc',width=14).grid(row=i,column=4,sticky=W,pady=5,padx=2)
 	else:
 		num    = ttk.Label(main,text=x[0],font='Arial 16',background='#b3b4bc',width=12,anchor='w').grid(row=i,column=0,sticky=W,padx=2)
 		type   = ttk.Label(main,text=x[1],font='Arial 16',background='#b3b4bc',width=10).grid(row=i,column=1,sticky=W)
 		cab    = ttk.Label(main,text=x[2],font='Arial 16',background='#b3b4bc',width=7,anchor='w').grid(row=i,column=2,sticky=W,padx=2)
 		status = ttk.Label(main,text=x[3],font='Arial 16',background='#b3b4bc',width=7).grid(row=i,column=3,sticky=W)           
-		data   = ttk.Label(main,text=x[4],font='Arial 16',background='#b3b4bc',width=13).grid(row=i,column=4,sticky=W,padx=2)
+		data   = ttk.Label(main,text=x[4],font='Arial 16',background='#b3b4bc',width=14).grid(row=i,column=4,sticky=W,padx=2)
 
 
 def typebtn(obj,type):
