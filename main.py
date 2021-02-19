@@ -1,6 +1,6 @@
 from tkinter import *
 from functools import partial
-from tkinter import messagebox
+
 import sqlite3
 import test
 import datetime
@@ -45,7 +45,6 @@ def validateLogin(username, password):
         else:
             messagebox.showinfo("Ошибка", 'Неправильный логин или пароль.\nВведите коректные данные или зарегестрируйтесь')
     
-         
     
 def mainFrame():
     auth.destroy()
