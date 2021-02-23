@@ -168,6 +168,65 @@ def deletestr(number, delete):
 	sleep(1)
 	mainmenu()
 
+def selectFrame():
+	select = Toplevel(root)
+	w = 800
+	h = 400
+	size(w,h,select)
+	select.grid()
+	comtype = []
+	comlist(comtype,typelist)
+	comstatus = []
+	comlist(comstatus,statuslist)
+	comcab = []
+	comlist(comcab,cablist)
+
+	lbldate = ttk.Label(select,text='Дата',font='Arial 16').grid(row=0,column=0,columnspan=2,pady=(20,0))
+	fselectstartdate = StringVar()
+	selectstartdate= Calendar(select,background='#41ABE9',textvariable = fselectstartdate).grid(row=1,column=0,padx=10,pady=5)
+	fselectfinishdate = StringVar()
+	selectfinishdate = Calendar(select,background='#41ABE9',textvariable = fselectfinishdate).grid(row=1,column=1,pady=5)
+
+	
+	
+	type = ttk.Label(select,text='Тип', font='Arial 16').grid(row=0,column=2,columnspan=6,pady=(25,0))
+	listtype = Listbox(select,font='Arial 16',height=6)
+
+	for type in comtype:
+		listtype.insert(END, type)
+	
+	listtype.grid(column=2,row=1, columnspan=5, rowspan=1,padx=(25,0),pady=(5,0))
+	scrolltype = ttk.Scrollbar(select)
+	listtype.config(yscrollcommand=scrolltype.set)
+	scrolltype.config(command=listtype.yview)
+	scrolltype.grid(column=7, row=1, rowspan=2,  sticky=S+N+W,pady=(5,0))
+
+	cab = ttk.Label(select,text='Кабинет', font='Arial 16').grid(row=3,column=0,columnspan=1,pady=(5,0))
+	listcab = Listbox(select,font='Arial 16',height=4,width=8)
+
+	for cab in comcab:
+		listcab.insert(END, cab)
+	
+	listcab.grid(column=0,row=4, rowspan=1,padx=(80,0),pady=(15,0),sticky=W)
+	scrollcab = ttk.Scrollbar(select)
+	listcab.config(yscrollcommand=scrollcab.set)
+	scrollcab.config(command=listcab.yview)
+	scrollcab.grid(column=0, row=4, rowspan=2,  sticky=S+N,pady=(15,0),padx=(85,0))
+
+	status = ttk.Label(select,text='Кабинет', font='Arial 16').grid(row=3,column=1,columnspan=1,pady=(5,0))
+	liststatus = Listbox(select,font='Arial 16',height=4,width=9)
+
+	for status in comstatus:
+		liststatus.insert(END, status)
+	
+	liststatus.grid(column=1,row=4, rowspan=1,padx=(70,0),pady=(15,0),sticky=W)
+	scrollstatus = ttk.Scrollbar(select)
+	liststatus.config(yscrollcommand=scrollstatus.set)
+	scrollstatus.config(command=liststatus.yview)
+	scrollstatus.grid(column=1, row=4, rowspan=2,  sticky=S+N,pady=(15,0),padx=(110,0))
+
+	btn = ttk.Button(select,text='Сделать запрос',style = "Bold.TButton").grid(column=6,row=4,sticky=S+E)
+
 
 def clearFrame():
 	for widget in main.winfo_children():
@@ -189,7 +248,8 @@ def clearFrame():
 	# fstatus2 = partial(typebtn,'status',2)
 	# btnstatus1 = ttk.Button(main,text='Архив', width=11,style = "Bold.TButton", command=fstatus2).grid(row=4,column=6,sticky=E,padx=5)
 	btnadd = ttk.Button(main,text='Добавить', width=9,style = "Bold.TButton",command=addFrame).grid(row=17,column=0,sticky=E,padx=2,pady=5)
-	btndelete = ttk.Button(main,text='Удалить', width=9,style = "Bold.TButton",command=deleteFrame).grid(row=17,column=1,sticky=W,pady=5)
+	btndelete = ttk.Button(main,text='Удалить', width=9,style = "Bold.TButton",command=deleteFrame).grid(row=17,column=1,sticky=W,pady=5,padx=4)
+	btnselect = ttk.Button(main,text='Выбор', width=9, style = "Bold.TButton", command=selectFrame).grid(row=17,column=2,columnspan=2,sticky=W,pady=5)
 
 
 
