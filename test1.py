@@ -4,8 +4,11 @@ from tkinter import *
 from functools import partial
 from tkinter import messagebox
 import sqlite3
-import test
 import tkinter.font as tkFont
+from tkcalendar import Calendar
+from datetime import datetime
+from time import sleep
+from table import *
 
 
 #Регистрация
@@ -47,11 +50,11 @@ def validateLogin(username, password):
         else:
             messagebox.showinfo("Ошибка", 'Неправильный логин или пароль.\nВведите коректные данные или зарегестрируйтесь')
     
-         
     
 def mainFrame():
+    table()
     auth.destroy()
-    test.main(root)
+    
 
 
 root = ThemedTk()
