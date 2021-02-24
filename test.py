@@ -26,6 +26,15 @@ cablist = '''SELECT cabinet.number FROM list
 
 insertsql = 'INSERT INTO list( inventNum, type, cab, status, dataRegistration, dataEdit )'
 
+selectsql = '''SELECT inventNum, typetext, cabinet.number, statustext, dataRegistration FROM list
+				JOIN typelist ON list.type = typelist.id
+				JOIN statuslist ON list.status = statuslist.id
+				JOIN cabinet ON list.cab = cabinet.id
+				WHERE list.cab = {}
+				WHERE list.type = {} 
+				WHERE list.status = {}
+				WHERE dataRegistration >= {}
+				WHERE dataRegistration <= {}'''
 
 def date():
 	time = datetime.now()
@@ -190,7 +199,7 @@ def selectFrame():
 	
 	
 	type = ttk.Label(select,text='Тип', font='Arial 16').grid(row=0,column=2,columnspan=6,pady=(25,0))
-	listtype = Listbox(select,font='Arial 16',height=6)
+	listtype = Listbox(select,font='Arial 16',height=6,selectmode=EXTENDED)
 
 	for type in comtype:
 		listtype.insert(END, type)
@@ -202,7 +211,7 @@ def selectFrame():
 	scrolltype.grid(column=7, row=1, rowspan=2,  sticky=S+N+W,pady=(5,0))
 
 	cab = ttk.Label(select,text='Кабинет', font='Arial 16').grid(row=3,column=0,columnspan=1,pady=(5,0))
-	listcab = Listbox(select,font='Arial 16',height=4,width=8)
+	listcab = Listbox(select,font='Arial 16',height=4,width=8,selectmode=EXTENDED)
 
 	for cab in comcab:
 		listcab.insert(END, cab)
@@ -213,8 +222,8 @@ def selectFrame():
 	scrollcab.config(command=listcab.yview)
 	scrollcab.grid(column=0, row=4, rowspan=2,  sticky=S+N,pady=(15,0),padx=(85,0))
 
-	status = ttk.Label(select,text='Кабинет', font='Arial 16').grid(row=3,column=1,columnspan=1,pady=(5,0))
-	liststatus = Listbox(select,font='Arial 16',height=4,width=9)
+	status = ttk.Label(select,text='Статус', font='Arial 16').grid(row=3,column=1,columnspan=1,pady=(5,0))
+	liststatus = Listbox(select,font='Arial 16',height=4,width=9,selectmode=EXTENDED)
 
 	for status in comstatus:
 		liststatus.insert(END, status)
@@ -224,8 +233,15 @@ def selectFrame():
 	liststatus.config(yscrollcommand=scrollstatus.set)
 	scrollstatus.config(command=liststatus.yview)
 	scrollstatus.grid(column=1, row=4, rowspan=2,  sticky=S+N,pady=(15,0),padx=(110,0))
+	fbtn = partial(btnsqlselect,liststatus,listcab,listtype,fselectstartdate,fselectfinishdate)
+	btn = ttk.Button(select,text='Сделать запрос',style = "Bold.TButton",command=fbtn).grid(column=6,row=4,sticky=S+E)
 
-	btn = ttk.Button(select,text='Сделать запрос',style = "Bold.TButton").grid(column=6,row=4,sticky=S+E)
+def btnsqlselect(status,cab,type,startdate,finishdate):
+	print(status.curselection())
+	print(cab.curselection())
+	print(type.curselection())
+	print(startdate.get())
+	print(finishdate.get())
 
 
 def clearFrame():
@@ -248,8 +264,8 @@ def clearFrame():
 	# fstatus2 = partial(typebtn,'status',2)
 	# btnstatus1 = ttk.Button(main,text='Архив', width=11,style = "Bold.TButton", command=fstatus2).grid(row=4,column=6,sticky=E,padx=5)
 	btnadd = ttk.Button(main,text='Добавить', width=9,style = "Bold.TButton",command=addFrame).grid(row=17,column=0,sticky=E,padx=2,pady=5)
-	btndelete = ttk.Button(main,text='Удалить', width=9,style = "Bold.TButton",command=deleteFrame).grid(row=17,column=1,sticky=W,pady=5,padx=4)
-	btnselect = ttk.Button(main,text='Выбор', width=9, style = "Bold.TButton", command=selectFrame).grid(row=17,column=2,columnspan=2,sticky=W,pady=5)
+	btndelete = ttk.Button(main,text='Удалить', width=9,style = "Bold.TButton",command=deleteFrame).grid(row=17,column=1,columnspan=2,sticky=W,pady=5,padx=4)
+	btnselect = ttk.Button(main,text='Выбор', width=9, style = "Bold.TButton", command=selectFrame).grid(row=17,column=3,columnspan=2,sticky=W,pady=5)
 
 
 
