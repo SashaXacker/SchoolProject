@@ -488,7 +488,7 @@ def previous_str(current_str, current_sql):
             cur.execute(current_sql)
             i = 2
             for j in range(0, current_len - 15):
-                x = cur.fetchone()
+                _ = cur.fetchone()
             for x in range(current_len, current_str):
                 x = cur.fetchone()
                 view(i, *x)
@@ -504,7 +504,7 @@ def previous_str(current_str, current_sql):
             cur.execute(current_sql)
             i = 2
             for j in range(0, current_len):
-                x = cur.fetchone()
+                _ = cur.fetchone()
 
             sql_list = cur.fetchall()
             for x in sql_list:

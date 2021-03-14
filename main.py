@@ -64,9 +64,9 @@ hs = root.winfo_screenheight()
 x = (ws / 2) - (w / 2)
 y = (hs / 2) - (h / 2)
 root.geometry('%dx%d+%d+%d' % (w, h, x, y))
-
 root.title('Authentication')
-
+boldStyle = ttk.Style()
+boldStyle.configure("Bold.TButton", font=('Arial', '14'))
 # Окно авторизации в систему
 auth = ttk.Frame(root)
 
@@ -83,10 +83,9 @@ password = StringVar()
 passwordEntry = ttk.Entry(auth, textvariable=password, show='*', width=20, font="Arial 14")
 passwordEntry.grid(row=1, column=1)
 validateLogin = partial(validate_login, username, password)
-loginButton = ttk.Button(auth, text="Authentication", width=11, command=validateLogin, style="Bold.TButton")
-loginButton.grid(row=4, column=0, columnspan=2, sticky=W, padx=15)
+loginButton = ttk.Button(auth, text="Authentication", width=14, command=validateLogin, style="Bold.TButton")
+loginButton.grid(row=4, column=0, columnspan=2, sticky=W, padx=(0, 180))
 reg = partial(reg, username, password)
-regButton = ttk.Button(auth, text="Registration", width=11, command=reg, style="Bold.TButton")
-regButton.grid(row=4, column=1, columnspan=2, padx=70)
-
+regButton = ttk.Button(auth, text="Registration", width=14, command=reg, style="Bold.TButton")
+regButton.grid(row=4, column=1, columnspan=2, padx=(60, 0))
 root.mainloop()

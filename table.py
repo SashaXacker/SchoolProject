@@ -10,47 +10,46 @@ from time import sleep
 
 
 def main():
+
 	sql = '''SELECT inventNum, typetext, cabinet.number, statustext, dataEdit FROM list
-					JOIN typelist ON list.type = typelist.id
-					JOIN statuslist ON list.status = statuslist.id
-					JOIN cabinet ON list.cab = cabinet.id'''
+	                JOIN typelist ON list.type = typelist.id
+	                JOIN statuslist ON list.status = statuslist.id
+	                JOIN cabinet ON list.cab = cabinet.id'''
 
 	sqlType = '''SELECT inventNum, typetext, cabinet.number, statustext, dataEdit FROM list
-					JOIN typelist ON list.type = typelist.id
-					JOIN statuslist ON list.status = statuslist.id
-					JOIN cabinet ON list.cab = cabinet.id
-					WHERE list.{obj} = {type}'''
+	                JOIN typelist ON list.type = typelist.id
+	                JOIN statuslist ON list.status = statuslist.id
+	                JOIN cabinet ON list.cab = cabinet.id
+	                WHERE list.{obj} = {type}'''
 
 	typeList = '''SELECT typetext FROM typelist'''
 	statusList = 'SELECT statustext FROM statuslist'
 	cabList = '''SELECT cabinet.number FROM cabinet
-				 ORDER BY id'''
+	             ORDER BY id'''
 
 	insertSql = 'INSERT INTO list( inventNum, type, cab, status, dataRegistration, dataEdit )'
 
 	# НЕ ТРОГАТЬ
 	whereSql = '''SELECT inventNum, typetext, cabinet.number, statustext, dataRegistration FROM list
-					 JOIN typelist ON list.type = typelist.id
-					 JOIN statuslist ON list.status = statuslist.id
-					 JOIN cabinet ON list.cab = cabinet.id
+	                 JOIN typelist ON list.type = typelist.id
+	                 JOIN statuslist ON list.status = statuslist.id
+	                 JOIN cabinet ON list.cab = cabinet.id
 	WHERE'''
 	standardSql = '''SELECT inventNum, typetext, cabinet.number, statustext, dataRegistration FROM list
-					 JOIN typelist ON list.type = typelist.id
-					 JOIN statuslist ON list.status = statuslist.id
-					 JOIN cabinet ON list.cab = cabinet.id'''
+	                 JOIN typelist ON list.type = typelist.id
+	                 JOIN statuslist ON list.status = statuslist.id
+	                 JOIN cabinet ON list.cab = cabinet.id'''
 	selectSql = '''SELECT inventNum, typetext, cabinet.number, statustext, dataRegistration FROM list
-				   JOIN typelist ON list.type = typelist.id
-				   JOIN statuslist ON list.status = statuslist.id
-				   JOIN cabinet ON list.cab = cabinet.id
-				   WHERE list.cab = {cab} and list.status = {status} and list.type = {type}'''
-
+	               JOIN typelist ON list.type = typelist.id
+	               JOIN statuslist ON list.status = statuslist.id
+	               JOIN cabinet ON list.cab = cabinet.id
+	               WHERE list.cab = {cab} and list.status = {status} and list.type = {type}'''
 
 	def reverse_date(current_date):
 		f_date = current_date.split('.')
 		f_date = f_date[::-1]
 		f_date = '-'.join(f_date)
 		return f_date
-
 
 	def date():
 		time = datetime.now()
@@ -63,7 +62,6 @@ def main():
 		now = str(year) + '-' + str(month) + '-' + str(day)
 		return now
 
-
 	def size(width, height, current_frame):
 		current_frame.resizable(width=False, height=False)
 		ws = current_frame.winfo_screenwidth()
@@ -72,7 +70,6 @@ def main():
 		y = (hs / 2) - (height / 2)
 		current_frame.geometry('%dx%d+%d+%d' % (width, height, x, y))
 
-
 	def com_list(new_com_list, com_sql):
 		with sqlite3.connect('server.db') as con:
 			cur = con.cursor()
@@ -80,7 +77,6 @@ def main():
 			sql_list = cur.fetchall()
 			for x in sql_list:
 				new_com_list.append(x[0])
-
 
 	def add_frame():
 		add = Toplevel(root)
@@ -103,7 +99,8 @@ def main():
 		type_add = StringVar()
 		lbl_type = ttk.Label(add, text='Тип:', font='Arial 16', anchor='e')
 		lbl_type.grid(row=1, column=0, padx=5, pady=3, sticky=E)
-		add_type = ttk.Combobox(add, values=com_type, state='readonly', textvariable=type_add, font='Arial 16', width=17)
+		add_type = ttk.Combobox(add, values=com_type, state='readonly', textvariable=type_add, font='Arial 16',
+								width=17)
 		add_type.grid(row=1, column=1, pady=3, sticky=W)
 
 		cab_add = StringVar()
@@ -129,7 +126,6 @@ def main():
 		btn_add = ttk.Button(add, text='Добавить', style="Bold.TButton", command=f_add_str)
 		btn_add.grid(row=5, column=1, sticky='ES', pady=10)
 
-
 	def select(sql_object, sql_list, obj):
 		curr = ''
 		with sqlite3.connect('server.db') as con:
@@ -144,7 +140,6 @@ def main():
 					curr = x[0]
 					break
 		return curr
-
 
 	def add_str(number_add, type_add, cab_add, status_add, date_reg_add, add):
 		number = number_add.get()
@@ -168,7 +163,7 @@ def main():
 			cur = con.cursor()
 			try:
 				cur.execute('''INSERT INTO list (inventNum, type, cab, status, dataEdit, dataRegistration)
-							VALUES(?, ?, ?, ?, ?, ?)''', temp_list)
+	                        VALUES(?, ?, ?, ?, ?, ?)''', temp_list)
 				con.commit()
 				messagebox.showinfo('Успешно', 'Элемент добавлен')
 			except:
@@ -176,7 +171,6 @@ def main():
 		add.destroy()
 		sleep(1)
 		main_menu()
-
 
 	def delete_frame():
 		delete = Toplevel(root)
@@ -193,7 +187,6 @@ def main():
 		btn_delete = ttk.Button(delete, text='Удалить', style="Bold.TButton", command=f_delete_str)
 		btn_delete.grid(row=1, column=1, sticky='ES', pady=10)
 
-
 	def delete_str(number, delete):
 		number = number.get()
 		with sqlite3.connect('server.db') as con:
@@ -206,7 +199,6 @@ def main():
 		delete.destroy()
 		sleep(1)
 		main_menu()
-
 
 	def select_frame():
 		frame = Toplevel(root)
@@ -268,10 +260,10 @@ def main():
 		list_status.config(yscrollcommand=scroll_status.set)
 		scroll_status.config(command=list_status.yview)
 		scroll_status.grid(column=1, row=4, rowspan=2, sticky=S + N, pady=(15, 0), padx=(110, 0))
-		f_btn = partial(btn_sql_select, list_status, list_cab, list_type, f_select_start_date, f_select_finish_date, frame)
+		f_btn = partial(btn_sql_select, list_status, list_cab, list_type, f_select_start_date, f_select_finish_date,
+						frame)
 		btn = ttk.Button(frame, text='Сделать запрос', style="Bold.TButton", command=f_btn)
 		btn.grid(column=6, row=4, sticky=S + E)
-
 
 	def btn_sql_select(status, cab, current_type, start_date, finish_date, frame):
 		status = list(status.curselection())
@@ -330,7 +322,6 @@ def main():
 			messagebox.showinfo('Удачно', 'Найдено ' + str(len(cur.fetchall())) + ' элементов')
 			frame.destroy()
 			select_btn(select_sql)
-
 
 	def clear_frame():
 		for widget in main.winfo_children():
@@ -483,7 +474,7 @@ def main():
 				cur.execute(current_sql)
 				i = 2
 				for j in range(0, current_len - 15):
-					x = cur.fetchone()
+					_ = cur.fetchone()
 				for x in range(current_len, current_str):
 					x = cur.fetchone()
 					view(i, *x)
@@ -499,7 +490,7 @@ def main():
 				cur.execute(current_sql)
 				i = 2
 				for j in range(0, current_len):
-					x = cur.fetchone()
+					_ = cur.fetchone()
 
 				sql_list = cur.fetchall()
 				for x in sql_list:
