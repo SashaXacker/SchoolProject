@@ -1,64 +1,75 @@
 from tkinter import *
 from tkinter import messagebox
 from functools import partial
-import sqlite3
 from ttkthemes import ThemedTk
 import tkinter.ttk as ttk
+import mariadb
 from table import main
+import re
 
 
 # Регистрация
 def reg(user, passwd):
     this_login = user.get()
     this_password = passwd.get()
-    value = [this_login, this_password]
-    with sqlite3.connect('server.db') as con:
+    try:
+        con = mariadb.connect(
+            user="create",
+            password="fakepassword",
+            host="178.154.197.251",
+            port=3306,
+            database="db")
         cur = con.cursor()
-        try:
-            cur.execute('INSERT INTO users VALUES(?, ?)', value)
-            con.commit()
-            messagebox.showinfo('Успешно', 'Регистрация прошла успешно.\n Войдите в аккаунт.')
-        except:
-            messagebox.showinfo('Ошибка', 'Такой пользователь уже существует.')
+        cur.execute(f"CREATE USER '{this_login}'@'%' IDENTIFIED BY '{this_password}'")
+        cur.execute(f"GRANT SELECT ON db.* TO '{this_login}'@'%'")
+        con.commit()
+        messagebox.showinfo('Успешно', 'Вы успешно зарегестрировались')
+
+    except mariadb.Error:
+        messagebox.showwarning("Ошибка", 'Введите корректные данные для создания аккаунта.')
 
 
 # Авторизация: Проверка логина и пароля
 def validate_login(user, passwd):
     this_login = user.get()
     this_password = passwd.get()
-    with sqlite3.connect('server.db') as con:
+    try:
+        con = mariadb.connect(
+            user=this_login,
+            password=this_password,
+            host="178.154.197.251",
+            port=3306,
+            database="db")
+        con.close()
+        con = mariadb.connect(
+            user="create",
+            password="fakepassword",
+            host="178.154.197.251",
+            port=3306,
+            database="db")
         cur = con.cursor()
-        cur.execute('SELECT login FROM users')
-        logins = cur.fetchall()
-        el = -1
-        for login in logins:
-            el += 1
-            current_login = login[0]
-            if current_login == this_login:
-                cur.execute('SELECT password FROM users')
-                passwords = cur.fetchall()
-                if this_password == passwords[el][0]:
-                    main_frame()
-                    break
-                else:
-                    messagebox.showinfo("Ошибка", 'Неправильный логин или пароль.\n'
-                                                  'Введите корректные данные или зарегистрируйтесь')
-                    break
+        cur.execute(f"SHOW GRANTS FOR '{this_login}'@'%'")
+        tmp = cur.fetchall()
+        if bool(re.search(r'ALL PRIVILEGES', tmp[1][0])) or bool(re.search(r'ALL PRIVILEGES', tmp[0][0])):
+            main_frame(1, this_login, this_password)
         else:
-            messagebox.showinfo("Ошибка", 'Неправильный логин или пароль.\n'
-                                          'Введите корректные данные или зарегистрируйтесь')
+            main_frame(0, this_login, this_password)
+
+    except mariadb.Error:
+        messagebox.showwarning("Ошибка", 'Неправильный логин или пароль.\n'
+                                         'Введите корректные данные или зарегистрируйтесь')
 
 
-def main_frame():
+def main_frame(right, login, passwd):
     root.destroy()
-    main()
+    main(right, login, passwd)
 
 
 root = ThemedTk()
 root.set_theme("breeze")
 root.resizable(width=False, height=False)
-w = 850
-h = 650
+w = 360
+h = 120
 ws = root.winfo_screenwidth()
 hs = root.winfo_screenheight()
 x = (ws / 2) - (w / 2)
