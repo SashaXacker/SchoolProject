@@ -363,8 +363,8 @@ WHERE'''
 
         this_time = date('dmy_hms')
 
-        if not os.path.isdir("excel"):
-            os.mkdir("excel")
+        if not os.path.isdir("../excel"):
+            os.mkdir("../excel")
         df.to_excel(f'./excel/{this_time}.xlsx', index=False)
         messagebox.showinfo('Успешно', 'Файл успешно записан')
 
