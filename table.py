@@ -700,20 +700,6 @@ WHERE'''
                 i += 1
             a = i - 2
             call_next_btn(a, sql)
-        # with sqlite3.connect('server.db') as con:
-        #     cur = con.cursor()
-        #     cur.execute(sql)
-        #     sql_list = cur.fetchall()
-        #     i = 2
-        #     if len(sql_list) > 15:
-        #         cur.execute(sql)
-        #         for j in range(0, 15):
-        #             x = cur.fetchone()
-        #             view(i, *x)
-        #             i += 1
-        #         a = i - 2
-        #         call_next_btn(a, sql)
-
         else:
             for x in sql_list:
                 view(i, *x)

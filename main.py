@@ -23,7 +23,7 @@ def reg(user, passwd):
         cur.execute(f"CREATE USER '{this_login}'@'%' IDENTIFIED BY '{this_password}'")
         cur.execute(f"GRANT SELECT ON db.* TO '{this_login}'@'%'")
         con.commit()
-        messagebox.showinfo('Успешно', 'Вы успешно зарегестрировались')
+        messagebox.showinfo('Успешно', 'Вы успешно зарегистрировались')
 
     except mariadb.Error:
         messagebox.showwarning("Ошибка", 'Введите корректные данные для создания аккаунта.')
