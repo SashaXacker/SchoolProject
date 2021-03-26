@@ -39,9 +39,11 @@
 `git clone https://github.com/SuvorovAD/item-inventory`
 
 Далее установите все необходимые зависимости:
+
 `pip install -r requirements.txt`
 
 После этого вы можете запускать проект с помощью файла `main.py`:
+
 `python main.py`
 
 ## Работа с приложением
