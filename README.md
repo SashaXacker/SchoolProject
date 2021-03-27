@@ -36,7 +36,7 @@
 Также можно воспользоваться исходниками для использования приложения.
 Для начала клонируйте репозиторий:
 
-`git clone https://github.com/SuvorovAD/item-inventory`
+`git clone https://github.com/SuvorovAD/item-inventory.git`
 
 Далее установите все необходимые зависимости:
 
